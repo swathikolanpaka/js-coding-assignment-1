@@ -39,6 +39,13 @@ const changeObjectFormat = (eachObject) => {
   };
 };
 
+const checkingStatusAndPriority = (status, priority) => {
+  return status === "TO%20Do" && priority == "Low";
+};
+const checkingStatus = (status) => {
+  return status === "TO DO" || status === "DONE" || status === "IN PROGRESS";
+};
+
 //1 API
 app.get("/todos/", async (request, response) => {
   const { status, priority, search_q, category } = request.query;
@@ -47,7 +54,9 @@ app.get("/todos/", async (request, response) => {
   switch (true) {
     //1
     case status !== undefined:
-      if (status === "TO DO" || status === "DONE" || status === "IN PROGRESS") {
+      console.log(status);
+      if (checkingStatus(status)) {
+        console.log(checkingStatus(status));
         todoQuery = `SELECT *  FROM todo WHERE status LIKE "%${status}%";`;
       } else {
         response.status(400);
@@ -134,22 +143,22 @@ app.get("/agenda/", async (request, response) => {
 
 //4 api
 app.post("/todos/", async (request, response) => {
-  const todoDetails = request.body;
-  const { id, todo, priority, status, category, dueDate } = todoDetails;
-
-  const todoQuery = `INSERT INTO todo
-  (id,todo,category,priority,status,due_date)
-  VALUES
-   (
-    ${id},
-   "${todo}",
-    "${category}",
-    "${priority}",
-    "${status}",
-    ${dueDate} );`;
-  await db.run(todoQuery);
-
-  response.send("Todo Successfully Added");
+  let todoDetails = request.body;
+  let { id, todo, priority, status, category, dueDate } = todoDetails;
+  console.log(request.body);
+  //const todoQuery = `INSERT INTO todo
+  //(id,todo,category,priority,status,due_date)
+  //VALUES
+  //(
+  //${id},
+  //"${todo}",
+  //"${category}",
+  //"${priority}",
+  //"${status}",
+  //"${dueDate}");`;
+  // await db.run(todoQuery);
+  console.log(todoDetails);
+  // response.send("Todo Successfully Added");
 });
 
 //3 api
