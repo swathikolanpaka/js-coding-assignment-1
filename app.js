@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const dateFns = require("date-fns/format");
+const format = require("date-fns/format");
 const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
 const app = express();
@@ -16,7 +16,7 @@ const initializeDBAndServer = async () => {
       filename: dbPath,
       driver: sqlite3.Database,
     });
-    app.listen(3000, () => {
+    app.listen(3001, () => {
       console.log("Server Running at http://localhost:3000/");
     });
   } catch (e) {
@@ -39,25 +39,22 @@ const changeObjectFormat = (eachObject) => {
   };
 };
 
-const checkingStatusAndPriority = (status, priority) => {
-  return status === "TO%20Do" && priority == "Low";
-};
-const checkingStatus = (status) => {
-  return status === "TO DO" || status === "DONE" || status === "IN PROGRESS";
-};
-
 //1 API
 app.get("/todos/", async (request, response) => {
-  const { status, priority, search_q, category } = request.query;
+  let { status, priority, search_q, category } = request.query;
 
   let todoQuery = "";
   switch (true) {
     //1
     case status !== undefined:
       console.log(status);
-      if (checkingStatus(status)) {
-        console.log(checkingStatus(status));
+      if (status === "TO DO" || status === "DONE" || status === "IN PROGRESS") {
         todoQuery = `SELECT *  FROM todo WHERE status LIKE "%${status}%";`;
+        todoArray = await db.all(todoQuery);
+        todoArray = todoArray.map((eachObject) =>
+          changeObjectFormat(eachObject)
+        );
+        response.send(todoArray);
       } else {
         response.status(400);
         response.send("Invalid Todo Status");
@@ -67,6 +64,11 @@ app.get("/todos/", async (request, response) => {
     case priority !== undefined:
       if (priority === "LOW" || priority === "HIGH" || priority === "MEDIUM") {
         todoQuery = `SELECT * FROM todo WHERE priority LIKE "%${priority}%";`;
+        todoArray = await db.all(todoQuery);
+        todoArray = todoArray.map((eachObject) =>
+          changeObjectFormat(eachObject)
+        );
+        response.send(todoArray);
       } else {
         response.status(400);
         response.send("Invalid Todo Priority");
@@ -75,14 +77,23 @@ app.get("/todos/", async (request, response) => {
     //3
     case status !== undefined && priority !== undefined:
       todoQuery = `SELECT * FROM todo WHERE (status LIKE "%${status}%") AND (priority LIKE "%${priority}%");`;
+      todoArray = await db.all(todoQuery);
+      todoArray = todoArray.map((eachObject) => changeObjectFormat(eachObject));
+      response.send(todoArray);
       break;
     //4
     case search_q !== undefined:
       todoQuery = `SELECT * FROM todo WHERE todo LIKE "%${search_q}%";`;
+      todoArray = await db.all(todoQuery);
+      todoArray = todoArray.map((eachObject) => changeObjectFormat(eachObject));
+      response.send(todoArray);
       break;
     //5
     case category !== undefined && status !== undefined:
       todoQuery = `SELECT * FROM todo WHERE category LIKE "%${category}%" AND status LIKE "%${status}%";`;
+      todoArray = await db.all(todoQuery);
+      todoArray = todoArray.map((eachObject) => changeObjectFormat(eachObject));
+      response.send(todoArray);
       break;
     //6
     case category !== undefined:
@@ -92,6 +103,11 @@ app.get("/todos/", async (request, response) => {
         category !== "LEARNING"
       ) {
         todoQuery = `SELECT * FROM todo WHERE category LIKE "%${category}%";`;
+        todoArray = await db.all(todoQuery);
+        todoArray = todoArray.map((eachObject) =>
+          changeObjectFormat(eachObject)
+        );
+        response.send(todoArray);
       } else {
         response.status(400);
         response.send("Invalid Todo Category");
@@ -100,14 +116,16 @@ app.get("/todos/", async (request, response) => {
     //7
     case category !== undefined && priority !== undefined:
       todoQuery = `SELECT * FROM todo WHERE category LIKE "%${category}%" AND priority LIKE "%${priority}%";`;
+      todoArray = await db.all(todoQuery);
+      todoArray = todoArray.map((eachObject) => changeObjectFormat(eachObject));
+      response.send(todoArray);
       break;
     default:
       todoQuery = `SELECT * FROM todo;`;
+      todoArray = await db.all(todoQuery);
+      todoArray = todoArray.map((eachObject) => changeObjectFormat(eachObject));
+      response.send(todoArray);
   }
-
-  todoArray = await db.all(todoQuery);
-  todoArray = todoArray.map((eachObject) => changeObjectFormat(eachObject));
-  response.send(todoArray);
 });
 
 //2 api
@@ -133,32 +151,12 @@ app.get("/todos/:todoId/", async (request, response) => {
 //3 API
 app.get("/agenda/", async (request, response) => {
   const { date } = request.query;
-  console.log(date);
-  let newDateFormat = dateFns(new Date(date), "yyyy-MM-dd");
-  console.log(newDateFormat);
-  const dateQuery = `SELECT * FROM todo WHERE due_date=${newDateFormat};`;
+  // console.log(date);
+  let newDateFormat = format(new Date(date), "yyyy-MM-dd");
+  // console.log(newDateFormat);
+  const dateQuery = `SELECT * FROM todo WHERE due_date="${newDateFormat}";`;
   const dateArray = await db.all(dateQuery);
   response.send(dateArray);
-});
-
-//4 api
-app.post("/todos/", async (request, response) => {
-  let todoDetails = request.body;
-  let { id, todo, priority, status, category, dueDate } = todoDetails;
-  console.log(request.body);
-  //const todoQuery = `INSERT INTO todo
-  //(id,todo,category,priority,status,due_date)
-  //VALUES
-  //(
-  //${id},
-  //"${todo}",
-  //"${category}",
-  //"${priority}",
-  //"${status}",
-  //"${dueDate}");`;
-  // await db.run(todoQuery);
-  console.log(todoDetails);
-  // response.send("Todo Successfully Added");
 });
 
 //3 api
@@ -169,12 +167,32 @@ app.get("/todos/", async (request, response) => {
   response.send(todoArray);
 });
 
+//4 api
+app.post("/todos/", async (request, response) => {
+  let todoDetails = request.body;
+  let { id, todo, priority, status, category, dueDate } = todoDetails;
+  console.log(request.body);
+  const todoQuery = `INSERT INTO todo
+  (id,todo,category,priority,status,due_date)
+  VALUES
+(
+${id},
+  "${todo}",
+  "${category}",
+  "${priority}",
+  "${status}",
+  "${dueDate}");`;
+  await db.run(todoQuery);
+  console.log(todoDetails);
+  response.send("Todo Successfully Added");
+});
+
 //5 api
 app.put("/todos/:todoId/", async (request, response) => {
   let { todoId } = request.params;
   let { status, priority, todo, category, dueDate } = request.body;
   let updatedQuery = "";
-
+  console.log(request.body.status);
   switch (true) {
     //1 Scenario
     case status !== undefined:
@@ -240,7 +258,7 @@ app.put("/todos/:todoId/", async (request, response) => {
 app.delete("/todos/:todoId/", async (request, response) => {
   const { todoId } = request.params;
   const deleteQuery = `DELETE FROM todo WHERE id=${todoId};`;
-  await db.run(deleteQuery);
+  const update = await db.run(deleteQuery);
   response.send("Todo Deleted");
 });
 module.exports = app;

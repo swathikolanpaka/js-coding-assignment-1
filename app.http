@@ -1,71 +1,71 @@
 //1 http 
 //scenario 1:
-GET http://localhost:3000/todos/?status=TO%DO
+GET http://localhost:3001/todos/?status=TO%20DO
 ###
 //scenario 2:
-Get http://localhost:3000/todos/?priority=HIGH
+Get http://localhost:3001/todos/?priority=HIGH
  
 ###
 //scenario 3: 
-GET http://localhost:3000/todos/?priority=HIGH&status=IN%20PROGRESS
+GET http://localhost:3001/todos/?priority=HIGH&status=IN%20PROGRESS
 ###
 //scenario 4:
-Get http://localhost:3000/todos/?search_q=Buy 
+Get http://localhost:3001/todos/?search_q=Buy 
 ###
 //scenario 5:
-Get http://localhost:3000/todos/?category=WORK&status=DONE
+Get http://localhost:3001/todos/?category=WORK&status=DONE
 ###
 //scenario 6:
-Get http://localhost:3000/todos/?category=HOME
+Get http://localhost:3001/todos/?category=HOME
 ###
 //scenario 7:
-Get http://localhost:3000/todos/?category=LEARNING&priority=HIGH
+Get http://localhost:3001/todos/?category=LEARNING&priority=HIGH
  
 ###
 
 
 
 //2 http
-GET http://localhost:3000/todos/2/
+GET http://localhost:3001/todos/2/
 ###
 
 //3 api 
-GET http://localhost:3000/agenda/?date=2021-12-12
+GET http://localhost:3001/agenda/?date=2021-12-12
 ###
 
 //4 API 
-POST http://localhost:3000/todos/
+POST http://localhost:3001/todos/
 Content-Type: application/json 
 
 {
-
  "id": 6,
  "todo": "Finalize event theme",
  "priority": "LOW",
  "status": "TO DO",
  "category": "HOME",
  "dueDate": "2021-02-22"
-
 }
 ###
 
 //5 http
 //1 Scenario 
-PUT http://localhost:3000/todos/1
+PUT http://localhost:3001/todos/1
 Content-Type: application/json 
 
-{ "status": "DONE" }
+{ 
+    "status": "DONE" 
+}
 
 ###
 //2 Scenario 
-PUT http://localhost:3000/todos/2
+PUT http://localhost:3001/todos/2
 Content-Type: application/json 
 
 { "priority": "HIGH" }
 
 ###
 //3 Scenario 
-PUT http://localhost:3000/todos/3 
+PUT http://localhost:3001/todos/3 
 Content-Type: application/json 
 
 {
@@ -73,20 +73,26 @@ Content-Type: application/json
 }
 ###
 //4 Scenario 
-PUT http://localhost:3000/todos/3 
+PUT http://localhost:3001/todos/3 
 Content-Type: application/json 
 
-{ "category": "LEARNING" }
+{ 
+    "category": "LEARNING"
+}
 
 ###
 //5 Scenario 
-PUT http://localhost:3000/todos/3 
+PUT http://localhost:3001/todos/3 
 Content-Type: application/json 
 
-{ "dueDate": "2021-01-12" }
+{ 
+    "dueDate": "2021-01-12" 
+    
+    }
 
 
 ### 
+
 //6 API for delete todo 
-DELETE http://localhost:3000/todos/5 
+DELETE http://localhost:3001/todos/1/ 
 
