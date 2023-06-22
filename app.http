@@ -7,16 +7,16 @@ Get http://localhost:3001/todos/?priority=HIGH
  
 ###
 //scenario 3: 
-GET http://localhost:3001/todos/?priority=HIGH&status=IN%20PROGRESS
+GET http://localhost:3001/todos/?priority=HIGH&status=DONE
 ###
 //scenario 4:
 Get http://localhost:3001/todos/?search_q=Buy 
 ###
 //scenario 5:
 Get http://localhost:3001/todos/?category=WORK&status=DONE
-###
+//###
 //scenario 6:
-Get http://localhost:3001/todos/?category=HOME
+//Get http://localhost:3001/todos/?category=HOME
 ###
 //scenario 7:
 Get http://localhost:3001/todos/?category=LEARNING&priority=HIGH
