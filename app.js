@@ -202,20 +202,23 @@ app.get("/todos/:todoId/", async (request, response) => {
 
 //3 API
 app.get("/agenda/", async (request, response) => {
-  const { date } = request.query;
+  let { date } = request.query;
   console.log(date);
-  let newDateFormat = format(new Date(date), "yyyy-MM-dd");
-  console.log(newDateFormat);
-  console.log(isValid(new Date(newDateFormat)));
-  if (isValid(new Date(newDateFormat))) {
-    const dateQuery = `SELECT * FROM todo WHERE due_date="${newDateFormat}";`;
+  console.log(isValid(new Date(date)));
+  let newDateFormat = "";
+  if (isValid(new Date(date))) {
+    newDateFormat = format(new Date(date), "yyyy-MM-dd");
+    console.log(newDateFormat);
+    const dateQuery = `SELECT * FROM todo WHERE due_date="2021-12-22";`;
     console.log(dateQuery);
     const dateArray = await db.all(dateQuery);
+    console.log(dateArray);
     dateResultArray = dateArray.map((eachObject) =>
       changeObjectFormat(dateArray)
     );
-    response.send(dateArray);
-  } else if (isValid(new Date(newDateFormat)) !== true) {
+    response.send(dateResultArray);
+  } else {
+    console.log("not a valid date");
     response.status(400);
     response.send("Invalid Due Date");
   }
@@ -230,7 +233,7 @@ app.post("/todos/", async (request, response) => {
     checkStatus(status) &&
     checkPriority(priority) &&
     checkCategory(category) &&
-    dueDate !== undefined
+    isValid(new Date(dueDate))
   ) {
     console.log(checkStatus(status));
     const todoQuery = `INSERT INTO todo
@@ -320,7 +323,7 @@ app.put("/todos/:todoId/", async (request, response) => {
     case dueDate !== undefined:
       //console.log(dueDate);
 
-      if (dueDate !== undefined) {
+      if (isValid(new Date(dueDate))) {
         updatedQuery = `UPDATE todo SET due_date="${dueDate}" WHERE id=${todoId};`;
         await db.run(updatedQuery);
         response.send("Due Date Updated");

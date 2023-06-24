@@ -30,7 +30,7 @@ GET http://localhost:3001/todos/2/
 ###
 
 //3 api 
-GET http://localhost:3001/agenda/?date=2021-9-22
+GET http://localhost:3001/agenda/?date=2021-12-22
 ###
 
 //4 API 
@@ -40,10 +40,10 @@ Content-Type: application/json
 {
  "id": 6,
  "todo": "Finalize event theme",
- "priority": "LOw",
+ "priority": "LOW",
  "status": "TO DO",
  "category": "HOME",
- "dueDate": "2021-02-22"
+ "dueDate": "2021-1-22"
 }
 ###
 
